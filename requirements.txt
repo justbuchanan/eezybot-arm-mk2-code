@@ -1,0 +1,16 @@
+# A list of python modules needed for this project
+#
+# You can install these individually with the command `pip3 install
+# package-name` (replace "package-name" with the thing you want to install).
+#
+# Alternatively you can install everything listed below by running `pip3 install
+# -r requirements` after cd'ing to this directory.
+
+# Provides tools for using a pwm controller board connected to raspberry pi.
+# We're using this to control the servos. See docs at
+# https://circuitpython.readthedocs.io/projects/servokit/en/latest/.
+adafruit-circuitpython-servokit
+
+# We're using this to connect to the xbox controller, but it can do a lot of
+# other things.
+pygame
