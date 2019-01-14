@@ -1,0 +1,4 @@
+# Python automatically creates these files when you run python programs. We don't want to save them in git.
+__pycache__
+*.pyc
+
