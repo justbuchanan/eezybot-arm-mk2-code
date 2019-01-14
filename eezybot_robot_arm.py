@@ -1,6 +1,28 @@
 import pygame
 import time
 
+# Calculate what position to set the servo to given the value of the axis on the
+# xbox controller.
+# @param servo_min The position that the servo servo (a value between 0 and 180)
+#     should be at when the joystick axis is at position -1 (all the way down).
+# @param servo_max The position that the servo should be at when the joystick
+#     axis is at position 1 (all the way up).
+# Note: It's fine for servo_min to be bigger value than servo_max.
+def calculate_servo_command(axis_value, servo_min, servo_max, axis_min=-1, axis_max=1):
+	# x = axis value (our input), y = servo value (our output)
+	# y = mx + b
+	# m = slope = rise / run
+	m = (servo_max - servo_min) / (axis_max - axis_min)
+
+	# y = mx + b
+	# b = y - mx
+	# plug in a point for x,y and solve for b
+	b = servo_min - m*axis_min
+
+	# plug current axis_value into our linear equation as the value x (our
+	# input) to get the value of y (our servo output)
+	return m*axis_value + b
+
 # The servo_controller object allows us to set the positions of the servos
 from adafruit_servokit import ServoKit
 servo_controller = ServoKit(channels=16)
@@ -63,25 +85,25 @@ elbow_servo = servo_controller.servo[4]
 # joystick controller. For each joystick axis we're interested in, the value is
 # read and used to set the desired position of the corresponding servo.
 while True:
+	# This has to be called before j.get_axis() or j.get_button(), otherwise new
+	# axis movements / button presses won't be detected.
 	pygame.event.pump()
 	
 	# Gripper control!
-	#RT is Axis 5, minimum value is (-1.0) (minimum means button not clicked)
-	#(when Axis is pressed all the way it is (.999969482421875))
-	# the numbers go from (-1 to +1)
+	#RT is Axis 5, minimum value is (-1.0) (minimum means button not pressed )
+	# (when Axis is pressed all the way it is 1.0)
 	rt = j.get_axis(5)
-	#gripper_servo.angle = rt * (gripper_closed_value - gripper_open_value) / 2 + (2*gripper_open_value - gripper_closed_value)
-	gripper_servo.angle = servo_clamp( (-150/2) * rt + (150/2) )
+	gripper_servo.angle = calculate_servo_command(rt, 150, 0)
 	
 	# Base Control!
 	r3leftright = j.get_axis(3)
-	base_servo.angle = 90*r3leftright+90 
+	base_servo.angle = calculate_servo_command(r3leftright, 0, 180)
 	
 	# Shoulder control!
 	r3updown = j.get_axis(4)
-	# shoulder_servo.angle = 45.5*r3updown+87.5 # oops, this one is backwards. when the stick is up, the reading is -1 which is wierd
-	shoulder_servo.angle = -45.5*r3updown + 87.5
-	
+	# note: when this joystick axis is up, the reading is -1 which is wierd...
+	shoulder_servo.angle = calculate_servo_command(r3updown, 133, 42)
+
 	# Elbow control!
 	l3updown = j.get_axis(1)
-	elbow_servo.angle = 34.5*l3updown+144.5
+	elbow_servo.angle = calculate_servo_command(l3updown, 110, 179)
