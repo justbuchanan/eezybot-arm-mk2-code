@@ -59,10 +59,9 @@ base_servo = servo_controller.servo[3]
 shoulder_servo = servo_controller.servo[2]
 elbow_servo = servo_controller.servo[4]
 
-# Main loop. Controls each of the robot arm servos according to the axes/buttons
-# on the joystick controller. For each joystick axis we're interested in, the
-# value is read and used to set the desired position of the corresponding servo.
-# The gripper is opened and closed with a button.
+# Main loop. Controls each of the robot arm servos according to the axes on the
+# joystick controller. For each joystick axis we're interested in, the value is
+# read and used to set the desired position of the corresponding servo.
 while True:
 	pygame.event.pump()
 	
